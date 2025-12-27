@@ -1,0 +1,7 @@
+[deps]
+BlackBoxOptim = "a134a8b2-14d6-55f6-9291-3336d3ab0209"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+NLopt = "76087f3c-5699-56af-9a33-bf431cd00edd"
+Optim = "429524aa-4258-5aef-a3af-852621145aeb"
+Surrogates = "6fc51010-71bc-11e9-0e15-a3fcc6593c49"
+XLSX = "fdbf4ff8-1666-58a4-91e7-1b58723a45e0"

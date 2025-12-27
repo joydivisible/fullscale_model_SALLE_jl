@@ -1,0 +1,12 @@
+TODO: tuesday oct 28
+
+- Review data San sent, see if can refine assumptions with a correction based on this
+- Make sure current approximation is valid. want to calculate experimental UNCERTAINTY and it must be COMPARABLE to UQ uncertainty
+    -ftcn not differentiable, so no jacobian
+    -compare COMBINED uncertainty to residuals -> need residuals slightly lower than 2 for most data points?
+- One of the almeida plots looks nice -- maybe make all like that?
+
+- try a non-overfitting tau 0 workflow?
+
+
+check if almeida reports feeds for their organic compositions, but i think not

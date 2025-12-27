@@ -1,0 +1,90 @@
+numpy
+scipy
+pandas
+numba
+openpyxl
+
+
+const INITIAL_GUESSES = Dict(
+    0.0 => [-0.3818, 0.0746, 0.5176, -0.4753, 0.0367, 0.3771],
+    5.0 => [-0.4339, 0.0843, 0.5925, -0.3345, 0.0496, 0.4162],
+    10.0 => [-0.4885, 0.0863, 0.6095, -0.3714, 0.0175, 0.4323]
+)
+
+usage: [X_EthylAcetate, X_Water, X_Furfural]
+
+
+trial2ref, old code:
+
+function fit_tau_nrtl(tie_lines)
+    lb = fill(-2.0, 6)
+    ub = fill(2.0, 6)
+
+    # Use a smaller number of initial samples to speed up the process
+    num_initial_samples = 10 
+    println("PHASE 1: Building surrogate model with $num_initial_samples initial points...")
+    
+    # A counter to pass to the loss function for clear logging
+    iter_counter = Ref(0)
+    f = p -> begin
+        iter_counter[] += 1
+        loss_from_tau_vector(collect(p), tie_lines, iter_counter[])
+    end
+
+    X_tuples = sample(num_initial_samples, lb, ub, SobolSample())
+    X = [collect(x) for x in X_tuples]
+    Y = [f(x) for x in X]
+    
+    println("\nPHASE 2: Optimizing with surrogate model (SRBF)...")
+    surrogate = Kriging(X, Y, lb, ub)
+    
+    # Reduce maxiters for the surrogate optimization part
+    num_surrogate_steps = 10
+    surrogate_optimize(f, SRBF(), lb, ub, surrogate, RandomSample(); maxiters=num_surrogate_steps)
+
+    best_params = surrogate.x[argmin(surrogate.y)]
+    best_loss_surrogate = minimum(surrogate.y)
+    println("\n--- Surrogate Optimization Complete ---")
+    println("Best params from surrogate: $(round.(best_params, digits=4))")
+    println("Best loss from surrogate: $(round(best_loss_surrogate, digits=5))")
+
+    # PHASE 3: Polishing the result with a gradient-based optimizer
+    println("\nPHASE 3: Polishing final parameters with L-BFGS...")
+    optf = OptimizationFunction((p, _) -> loss_from_tau_vector(p, tie_lines, iter_counter[]), Optimization.AutoZygote())
+    prob = OptimizationProblem(optf, best_params, lb=lb, ub=ub)
+    
+    # The L-BFGS solver is often much faster for the final steps
+    result = solve(prob, LBFGS(), maxiters=20)
+    final_params = result.u
+    final_loss = result.minimum
+    
+    tau_matrix = reshape_tau(final_params)
+    return tau_matrix, final_loss
+end
+
+
+checkpoint: trying to specify num_new_samples=1 to avoid default of 10, since 10x10=100 outer loop iterations (i think)
+
+
+good ones:
+- trial5ref_2stagesonly.jl
+- trial5ref_calculate_phase_split.jl
+- trial5ref_validate_model.jl
+
+order rn: W F EA
+
+next steps:
+- make the tau optimizer store optimized tau in a CSV file, indexed by salt % (rn: 0)
+- make 2 equivalent scripts but to run 5 and 10 wt%, with their 2 csvs
+- run the data plotter (ternary) without omitting any tie lines (overcrowd, wanna see how much variability aspen predicts).
+- do lit. review and check aspen eNRTL documentation, to see if alpha shouldve been 0.3 (might give better fit)
+
+- run all 100-200 tielines per salt conc once, once solver is robust enough, for best RMSE/fit
+
+- literature review to see if linear fit is justified (or analyze the 3 taus obtained). if not, generate more data points (+5 approx.) to fit a curve and nonlinearly intrapolate tau
+
+for the paper in general:
+maybe run more data for ternary, fit furfural at lower amounts for more experimental relevance (check goldfarbs paper to establish normal biocrude % in water waste)
+-> update CSVs for this. shouldnt rlly affect fit quality, tho it will change the actual numbers
+ultimately want to extrapolate taus
+- more writing needed!
