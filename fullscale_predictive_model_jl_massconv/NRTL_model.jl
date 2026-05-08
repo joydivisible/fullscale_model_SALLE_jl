@@ -1,6 +1,4 @@
 # NRTL_Model.jl
-# This file contains the definitive, correct, and simplified implementation of the
-# NRTL activity coefficient model. It uses explicit for-loops for clarity and robustness.
 
 using LinearAlgebra
 
@@ -11,14 +9,14 @@ const ALPHA_CONST = 0.2
     activity_coefficients(x, tau)
 
 Calculates the activity coefficients (γ) for a mixture with mole fractions `x`
-using the NRTL model with binary interaction parameters `tau`.
+using the NRTL model with binary interaction parameters tau
 
-# Arguments
-- `x`: A vector of mole fractions for each component.
-- `tau`: A matrix of binary interaction parameters (τ_ij).
+# takes args:
+- 'x': vector of mole fractions for each component
+- 'tau': matrix of binary interaction parameters (τ_ij)
 
-# Returns
-- A vector of activity coefficients (γ) for each component.
+# returns:
+- vector of activity coefficients (γ) for each component
 """
 function activity_coefficients(x, tau)
     n = length(x)
