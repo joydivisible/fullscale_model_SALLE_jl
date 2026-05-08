@@ -1,1 +1,1 @@
-Private commit of SALLE model workspace uncleaned
+Private commit of SALLE model workspace in cleaning
