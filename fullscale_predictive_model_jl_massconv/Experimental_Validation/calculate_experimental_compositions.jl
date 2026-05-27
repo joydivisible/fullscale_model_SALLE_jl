@@ -10,7 +10,7 @@ using CSV, DataFrames, Statistics, Interpolations, LinearAlgebra
 M_water = 18.015
 M_EA    = 88.106
 
-# SHRINKAGE CORRECTION FROM EXCESS MOLAR VOLUME
+# SHRINKAGE CORRECTION FROM EXCESS MOLAR VOLUME (not currently used in final calculations, but kept for potential future use)
 # Molar volumes (cm³/mol)
 V_H2O = M_water / ρ_water
 V_EA  = M_EA / ρ_EA
